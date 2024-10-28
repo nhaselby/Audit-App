@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 import matplotlib.pyplot as plt
+from io import BytesIO
 
 # Load the dataset
 data = pd.read_csv('monthly_expenses_data.csv', parse_dates=['Date'], index_col='Date')
@@ -31,17 +32,41 @@ forecast_index = pd.date_range(data.index[-1] + pd.DateOffset(months=1), periods
 forecast_values = forecast.predicted_mean
 forecast_ci = forecast.conf_int()
 
+# Prepare forecast results for CSV export
+forecast_df = pd.DataFrame({
+    'Date': forecast_index,
+    'Forecasted_Expenses': forecast_values,
+    'Lower_CI': forecast_ci.iloc[:, 0],
+    'Upper_CI': forecast_ci.iloc[:, 1]
+})
+csv_data = forecast_df.to_csv(index=False).encode()
+
 # Plot the results
 fig, ax = plt.subplots(figsize=(10, 5))
 ax.plot(data.index, data['Monthly_Expenses'], label='Observed')
-ax.plot(forecast_index, forecast_values, label='Forecast', color='orange')
+ax.plot(forecast_index, forecast_values, label='Forecast', color='red', linestyle='--')
 ax.fill_between(forecast_index, forecast_ci.iloc[:, 0], forecast_ci.iloc[:, 1], color='orange', alpha=0.3)
 ax.set_title('Monthly Expenses Forecast')
 ax.set_xlabel('Date')
 ax.set_ylabel('Monthly Expenses')
 ax.legend()
 
+# Add extra room on the y-axis
+y_min = min(data['Monthly_Expenses'].min(), forecast_ci.iloc[:, 0].min())
+y_max = max(data['Monthly_Expenses'].max(), forecast_ci.iloc[:, 1].max())
+y_buffer = (y_max - y_min) * 0.1
+ax.set_ylim(y_min - y_buffer, y_max + y_buffer)
+
 # Display the plot and model details in Streamlit
 st.title("ARIMAX Model for Monthly Expenses Forecast")
+st.subheader("Created by Noah Haselby")
 st.write("This app uses an ARIMAX model to forecast monthly expenses, allowing users to adjust GDP and CPI forecasts.")
 st.pyplot(fig)
+
+# Export forecast results as CSV
+st.download_button(
+    label="Download Forecast as CSV",
+    data=csv_data,
+    file_name="forecasted_expenses.csv",
+    mime="text/csv"
+)
