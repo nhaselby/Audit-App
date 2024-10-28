@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from statsmodels.tsa.statespace.sarimax import SARIMAX
+import statsmodels.api as sm
 import matplotlib.pyplot as plt
-from io import BytesIO
+
 
 # Load the dataset
 data = pd.read_csv('monthly_expenses_data.csv', parse_dates=['Date'], index_col='Date')
@@ -18,7 +18,7 @@ cpi_forecast = st.sidebar.slider("CPI Rate (%)", min_value=0.0, max_value=5.0, v
 external_regressors = data[['GDP_Growth_Rate', 'CPI_Rate']]
 
 # Train the ARIMAX model
-model = SARIMAX(data['Monthly_Expenses'], exog=external_regressors, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
+model = sm.tsa.statespace.SARIMAX(data['Monthly_Expenses'], exog=external_regressors, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
 model_fit = model.fit(disp=False)
 
 # Create forecast values for the external regressors based on user input
