@@ -3,4 +3,4 @@ pandas
 numpy
 statsmodels.api
 matplotlib.pyplot
-/mount/src/audit-app/audit-app/audit_app.py
+audit_app.py
