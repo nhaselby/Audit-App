@@ -1,0 +1,27 @@
+import pandas as pd
+import numpy as np
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Define date range for the past 4 years on a monthly basis
+dates = pd.date_range(start='2020-01-01', end='2023-12-01', freq='MS')
+
+# Generate random data for monthly expenses, GDP growth rate, and CPI rate
+num_months = len(dates)
+monthly_expenses = np.random.normal(loc=2000, scale=200, size=num_months)
+gdp_growth_rate = np.random.normal(loc=2, scale=0.5, size=num_months)
+cpi_rate = np.random.normal(loc=2, scale=0.3, size=num_months)
+
+# Create a DataFrame to store the generated data
+data = pd.DataFrame({
+    'Date': dates,
+    'Monthly_Expenses': monthly_expenses,
+    'GDP_Growth_Rate': gdp_growth_rate,
+    'CPI_Rate': cpi_rate
+})
+
+# Export the DataFrame to a CSV file
+data.to_csv('monthly_expenses_data.csv', index=False)
+
+print("CSV file 'monthly_expenses_data.csv' has been created successfully.")
