@@ -1,5 +1,5 @@
-import streamlit
-import pandas
-import numpy
-import statsmodels.api
-import matplotlib.pyplot
+streamlit
+pandas
+numpy
+statsmodels.api
+matplotlib.pyplot
